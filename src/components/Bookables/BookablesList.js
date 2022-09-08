@@ -1,24 +1,40 @@
-import { useReducer } from 'react';
+import { useReducer, useEffect } from 'react';
 import data from '../../static.json';
-import { FaArrowRight } from 'react-icons/fa';
+import { FaArrowRight, FaSpinner } from 'react-icons/fa';
 import reducer from './reducer';
+import getData from '../../utils/api';
 
-const { bookables, sessions, days } = data;
+const { sessions, days } = data;
 
 const initialState = {
   group: 'Rooms',
   bookableIndex: 0,
   hasDetails: true,
-  bookables,
+  bookables: [],
+  isLoading: true,
+  error: false,
 };
 
 export default function BookablesList() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { group, bookableIndex, bookables, hasDetails } = state;
+  const { group, bookableIndex, bookables, hasDetails, isLoading, error } =
+    state;
 
   const bookablesInGroup = bookables.filter((b) => b.group === group);
   const bookable = bookablesInGroup[bookableIndex];
   const groups = [...new Set(bookables.map((b) => b.group))];
+
+  useEffect(() => {
+    dispatch({ type: 'FETCH_BOOKABLES_REQUEST' });
+
+    getData('http://localhost:3001/bookables')
+      .then((bookables) =>
+        dispatch({ type: 'FETCH_BOOKABLES_SUCCESS', payload: bookables })
+      )
+      .catch((error) =>
+        dispatch({ type: 'FETCH_BOOKABLES_ERROR', payload: error })
+      );
+  }, []);
 
   const nextBookable = () => {
     dispatch({ type: 'NEXT_BOOKABLE' });
@@ -41,6 +57,18 @@ export default function BookablesList() {
       payload: e.target.value,
     });
   };
+
+  if (error) {
+    return <p>{error.message}</p>;
+  }
+
+  if (isLoading) {
+    return (
+      <p>
+        <FaSpinner className="icon-loading" /> Loading bookables...
+      </p>
+    );
+  }
 
   return (
     <>
