@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Spinner from '../UI/Spinner';
 
 import getData from '../../utils/api';
@@ -9,18 +9,44 @@ export default function UserList() {
   const [error, setError] = useState(null);
   const [userIndex, setUserIndex] = useState(0);
   const user = users?.[userIndex];
+  const [isPresenting, setIsPresenting] = useState(false);
+
+  const timerRef = useRef(null);
 
   useEffect(() => {
     getData('http://localhost:3001/users')
       .then((users) => {
         setUsers(users);
         setIsLoading(false);
+        setIsPresenting(true);
       })
       .catch((error) => {
         setIsLoading(false);
         setError(error);
       });
   }, []);
+
+  useEffect(() => {
+    if (isPresenting) {
+      timerRef.current = setTimeout(() => {
+        setUserIndex((i) => (i + 1) % users.length);
+      }, 3000);
+    }
+    return () => {
+      stopPresenting();
+    };
+  });
+
+  const onUserSelect = (i) => {
+    setUserIndex(i);
+    setIsPresenting(false);
+    stopPresenting();
+  };
+
+  const stopPresenting = () => {
+    clearTimeout(timerRef.current);
+    timerRef.current = null;
+  };
 
   if (error) {
     return <p>{error.message}</p>;
@@ -29,8 +55,7 @@ export default function UserList() {
   if (isLoading) {
     return (
       <p>
-        <Spinner />
-        Loading users...
+        <Spinner /> Loading users...
       </p>
     );
   }
@@ -40,7 +65,7 @@ export default function UserList() {
       <ul className="users items-list-nav">
         {users.map((u, i) => (
           <li key={u.id} className={i === userIndex ? 'selected' : null}>
-            <button className="btn" onClick={() => setUserIndex(i)}>
+            <button className="btn" onClick={() => onUserSelect(i)}>
               {u.name}
             </button>
           </li>

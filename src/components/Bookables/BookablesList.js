@@ -1,4 +1,4 @@
-import { useReducer, useEffect } from 'react';
+import { useReducer, useEffect, useRef } from 'react';
 import data from '../../static.json';
 import { FaArrowRight, FaSpinner } from 'react-icons/fa';
 import reducer from './reducer';
@@ -13,16 +13,27 @@ const initialState = {
   bookables: [],
   isLoading: true,
   error: false,
+  isPresenting: false,
 };
 
 export default function BookablesList() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { group, bookableIndex, bookables, hasDetails, isLoading, error } =
-    state;
+  const {
+    group,
+    bookableIndex,
+    bookables,
+    hasDetails,
+    isLoading,
+    error,
+    isPresenting,
+  } = state;
 
   const bookablesInGroup = bookables.filter((b) => b.group === group);
   const bookable = bookablesInGroup[bookableIndex];
   const groups = [...new Set(bookables.map((b) => b.group))];
+
+  const timerRef = useRef(null);
+  const nextButtonRef = useRef();
 
   useEffect(() => {
     dispatch({ type: 'FETCH_BOOKABLES_REQUEST' });
@@ -36,8 +47,16 @@ export default function BookablesList() {
       );
   }, []);
 
+  useEffect(() => {
+    if (isPresenting) {
+      scheduleNext();
+    } else {
+      clearNextTimeout();
+    }
+  });
+
   const nextBookable = () => {
-    dispatch({ type: 'NEXT_BOOKABLE' });
+    dispatch({ type: 'NEXT_BOOKABLE', payload: false });
   };
 
   const changeBookable = (selectedIndex) => {
@@ -45,6 +64,7 @@ export default function BookablesList() {
       type: 'SET_BOOKABLE',
       payload: selectedIndex,
     });
+    nextButtonRef.current.focus();
   };
 
   const toggleDetails = () => {
@@ -56,6 +76,25 @@ export default function BookablesList() {
       type: 'SET_GROUP',
       payload: e.target.value,
     });
+
+    if (isPresenting) {
+      clearNextTimeout();
+      scheduleNext();
+    }
+  };
+
+  const scheduleNext = () => {
+    if (timerRef.current === null) {
+      timerRef.current = setTimeout(() => {
+        timerRef.current = null;
+        dispatch({ type: 'NEXT_BOOKABLE', payload: true });
+      }, 3000);
+    }
+  };
+
+  const clearNextTimeout = () => {
+    clearTimeout(timerRef.current);
+    timerRef.current = null;
   };
 
   if (error) {
@@ -94,7 +133,12 @@ export default function BookablesList() {
           ))}
         </ul>
         <p>
-          <button className="btn" onClick={nextBookable} autoFocus>
+          <button
+            className="btn"
+            onClick={nextBookable}
+            ref={nextButtonRef}
+            autoFocus
+          >
             <FaArrowRight />
             <span>Next</span>
           </button>
