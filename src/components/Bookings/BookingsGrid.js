@@ -1,39 +1,24 @@
-import { useState, useEffect, useMemo } from 'react';
-import { getGrid, transformBookings } from './grid-builder';
-import { getBookings } from '../../utils/api';
+import { useEffect } from 'react';
+import { useBookings, useGrid } from './bookingsHooks';
 
 import Spinner from '../UI/Spinner';
 
 export default function BookingsGrid(props) {
   const { week, bookable, booking, setBooking } = props;
-  const [bookings, setBookings] = useState(null);
-  const [error, setError] = useState(false);
 
-  const { grid, sessions, dates } = useMemo(
-    () => (bookable ? getGrid(bookable, week.start) : {}),
-    [bookable, week.start]
+  const { bookings, status, error } = useBookings(
+    bookable?.id,
+    week.start,
+    week.end
   );
+
+  const { grid, dates, sessions } = useGrid(bookable, week.start);
 
   // Effect
   useEffect(() => {
-    if (bookable) {
-      let doUpdate = true;
-
-      setBookings(null);
-      setError(false);
-      setBooking(null);
-
-      getBookings(bookable.id, week.start, week.end)
-        .then((resp) => {
-          if (doUpdate) {
-            setBookings(transformBookings(resp));
-          }
-        })
-        .catch(setError);
-
-      return () => (doUpdate = false);
-    }
-  }, [week, bookable, setBooking]);
+    // Deselect booking when user switches a week or bookable
+    setBooking(null);
+  }, [bookable, week.start, setBooking]);
 
   // UI helper
   const cell = (session, date) => {
@@ -45,7 +30,7 @@ export default function BookingsGrid(props) {
       <td
         key={date}
         className={isSelected ? 'selected' : null}
-        onClick={bookings ? () => setBooking(cellData) : null}
+        onClick={status === 'success' ? () => setBooking(cellData) : null}
       >
         {cellData.title}
       </td>
@@ -53,17 +38,21 @@ export default function BookingsGrid(props) {
   };
 
   if (!grid) {
-    return <p>Loading...</p>;
+    return <p>Waiting for bookable and week details</p>;
   }
 
   return (
     <>
-      {error && (
+      {status === 'error' && (
         <p className="bookingsError">
           {`There was a problem loading the bookings data ${error}`}
         </p>
       )}
-      <table className={bookings ? 'bookingsGrid active' : 'bookingsGrid'}>
+      <table
+        className={
+          status === 'success' ? 'bookingsGrid active' : 'bookingsGrid'
+        }
+      >
         <thead>
           <tr>
             <th>
