@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom';
 import { FaCloudUploadAlt, FaTrash, FaWindowClose } from 'react-icons/fa';
 
-import {
-  days as daysArray,
-  sessions as sessionsArray,
-} from '../../static.json';
+import data from '../../static.json';
+
+const { days: daysArray, sessions: sessionsArray } = data;
 
 export default function BookableForm({
   formState = {},

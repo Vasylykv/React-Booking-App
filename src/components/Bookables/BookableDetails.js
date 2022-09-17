@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { FaEdit } from 'react-icons/fa';
 import data from '../../static.json';
 
 const { sessions, days } = data;
@@ -24,6 +26,14 @@ export default function BookableDetails({ bookable }) {
               />
               Show Details
             </label>
+            <Link
+              to={`/bookables/${bookable.id}/edit`}
+              replace
+              className="btn btn-header"
+            >
+              <FaEdit />
+              <span>Edit</span>
+            </Link>
           </span>
         </div>
         <p>{bookable.notes}</p>
