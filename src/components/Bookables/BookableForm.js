@@ -75,7 +75,10 @@ export default function BookableForm({
 
       <p className="controls">
         {handleDelete && (
-          <button className="btn btn-delete controls-alt">
+          <button
+            className="btn btn-delete controls-alt"
+            onClick={handleDelete}
+          >
             <FaTrash />
             <span>Delete</span>
           </button>
