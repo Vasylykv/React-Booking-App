@@ -7,7 +7,9 @@ export default function UserList({ user, setUser }) {
     data: users = [],
     error,
     status,
-  } = useQuery('users', () => getData('http://localhost:3001/users'));
+  } = useQuery('users', () =>
+    getData(`${process.env.REACT_APP_BASE_URL}/users`)
+  );
 
   if (status === 'error') {
     return <p>{error.message}</p>;

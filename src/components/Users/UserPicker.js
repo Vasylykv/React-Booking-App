@@ -7,10 +7,11 @@ import getData from '../../utils/api';
 import Spinner from '../UI/Spinner';
 
 export default function UserPicker() {
+  console.log(process.env.REACT_APP_BASE_URL);
   const [user, setUser] = useUser();
 
   const { data: users = [], status } = useQuery('users', () =>
-    getData('http://localhost:3001/users')
+    getData(`${process.env.REACT_APP_BASE_URL}/users`)
   );
 
   useEffect(() => {

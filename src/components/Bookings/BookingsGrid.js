@@ -65,6 +65,7 @@ export default function BookingsGrid(props) {
             ))}
           </tr>
         </thead>
+
         <tbody>
           {sessions.map((session) => (
             <tr key={session}>

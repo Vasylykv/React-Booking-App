@@ -14,9 +14,11 @@ export default function BookablesView(props) {
     data: bookables = [],
     error,
     status,
-  } = useQuery('bookables', () => getData('http://localhost:3001/bookables'));
+  } = useQuery('bookables', () =>
+    getData(`${process.env.REACT_APP_BASE_URL}/bookables`)
+  );
 
-  const { id } = useParams();
+  const { id } = useParams(); // returns values as string type
 
   const bookable =
     bookables.find((bookable) => bookable.id === parseInt(id, 10)) ||

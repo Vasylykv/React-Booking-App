@@ -15,7 +15,7 @@ export default function BookableNew() {
     status,
     error,
   } = useMutation(
-    (item) => createItem('http://localhost:3001/bookables', item),
+    (item) => createItem(`${process.env.REACT_APP_BASE_URL}/bookables`, item),
     {
       onSuccess: (bookable) => {
         queryClient.setQueryData('bookables', (old) => [

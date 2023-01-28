@@ -12,7 +12,9 @@ export default function BookingsPage() {
     data: bookables = [],
     error,
     status,
-  } = useQuery('bookables', () => getData('http://localhost:3001/bookables'));
+  } = useQuery('bookables', () =>
+    getData(`${process.env.REACT_APP_BASE_URL}/bookables`)
+  );
 
   const { date, bookableId } = useBookingsParams();
 

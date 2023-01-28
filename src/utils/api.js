@@ -14,7 +14,8 @@ export function getBookings(bookableId, startDate, endDate) {
   const start = shortISO(startDate); // '2022-09-11'
   const end = shortISO(endDate); // '2022-09-15'
 
-  const urlRoot = 'http://localhost:3001/bookings';
+  // const urlRoot = 'http://localhost:3001/bookings';
+  const urlRoot = `${process.env.REACT_APP_BASE_URL}/bookings`;
 
   const query = `bookableId=${bookableId}&date_gte=${start}&date_lte=${end}`;
 

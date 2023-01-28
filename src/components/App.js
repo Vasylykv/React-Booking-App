@@ -11,7 +11,6 @@ import { UserProvider } from './Users/UserContext';
 
 import '../App.css';
 
-// creating a client instance
 const queryClient = new QueryClient();
 
 export default function App() {

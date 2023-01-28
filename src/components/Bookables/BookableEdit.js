@@ -53,7 +53,7 @@ function useBookable(id) {
   const queryClient = useQueryClient();
   return useQuery(
     ['bookable', id],
-    () => getData(`http://localhost:3001/bookables/${id}`),
+    () => getData(`${process.env.REACT_APP_BASE_URL}/bookables/${id}`),
     {
       refetchOnWindowFocus: false,
       initialData: queryClient
@@ -67,7 +67,8 @@ function useUpdateBookable() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const mutation = useMutation(
-    (item) => editItem(`http://localhost:3001/bookables/${item.id}`, item),
+    (item) =>
+      editItem(`${process.env.REACT_APP_BASE_URL}/bookables/${item.id}`, item),
     {
       onSuccess: (bookable) => {
         updateBookablesCache(bookable, queryClient);
@@ -102,7 +103,8 @@ function useDeleteBookable() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const mutation = useMutation(
-    (bookable) => deleteItem(`http://localhost:3001/bookables/${bookable.id}`),
+    (bookable) =>
+      deleteItem(`${process.env.REACT_APP_BASE_URL}/bookables/${bookable.id}`),
     {
       onSuccess: (response, bookable) => {
         const bookables = queryClient.getQueryData('bookables') || [];

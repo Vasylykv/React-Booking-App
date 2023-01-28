@@ -11,7 +11,7 @@ export function useBookings(bookableId, startDate, endDate) {
   const start = shortISO(startDate);
   const end = shortISO(endDate);
 
-  const urlRoot = `http://localhost:3001/bookings`;
+  const urlRoot = `${process.env.REACT_APP_BASE_URL}/bookings`;
   const queryString = `bookableId=${bookableId}&date_gte=${start}&date_lte=${end}`;
 
   const query = useQuery(['bookings', bookableId, start, end], () =>
@@ -49,7 +49,7 @@ export function useBookingsParams() {
     if (isDate(date)) params.date = date;
 
     if (params.date || params.bookableId !== undefined)
-      setSearchParams(params, { replace: true });
+      setSearchParams(params, { replace: true }); // replace prevents appearing of each visited date in browser's history
   };
 
   return {
