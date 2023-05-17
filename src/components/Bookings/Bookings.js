@@ -20,10 +20,17 @@ export default function Bookings({ bookable }) {
     setBooking(null);
   }, [bookable, weekStart]);
 
+  useEffect(() => {
+    if (booking?.id !== undefined && !selectedBooking) {
+      setBooking(null);
+    }
+  }, [booking, selectedBooking]);
+
   return (
     <div className="bookings">
       <div>
         <WeekPicker />
+
         <BookingsGrid
           week={week}
           bookable={bookable}
@@ -31,6 +38,7 @@ export default function Bookings({ bookable }) {
           setBooking={setBooking}
         />
       </div>
+
       <BookingDetails
         booking={selectedBooking || booking}
         bookable={bookable}

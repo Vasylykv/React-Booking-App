@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useBookings, useGrid } from './bookingsHooks';
 
 import Spinner from '../UI/Spinner';
@@ -13,12 +12,6 @@ export default function BookingsGrid(props) {
   );
 
   const { grid, dates, sessions } = useGrid(bookable, week.start);
-
-  // Effect
-  useEffect(() => {
-    // Deselect booking when user switches a week or bookable
-    setBooking(null);
-  }, [bookable, week.start, setBooking]);
 
   // UI helper
   const cell = (session, date) => {

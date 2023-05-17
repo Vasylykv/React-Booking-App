@@ -28,10 +28,6 @@ export default function BookableEdit() {
     updateBookable(formState.state);
   }
 
-  if (isLoading) {
-    return <PageSpinner />;
-  }
-
   if (isUpdateError || isDeleteError) {
     return <p>{updateError?.message || deleteError.message}</p>;
   }

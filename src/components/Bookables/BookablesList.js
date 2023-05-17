@@ -1,9 +1,5 @@
-import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowRight } from 'react-icons/fa';
-import useFetch from '../../utils/useFetch';
-import Spinner from '../UI/Spinner';
-// import getData from '../../utils/api';
 
 export default function BookablesList({ bookable, bookables, getUrl }) {
   const group = bookable?.group;

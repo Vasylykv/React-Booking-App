@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useQuery } from 'react-query';
-import getData from '../../utils/api';
+import { useQuery, useQueryClient, useMutation } from 'react-query';
+import getData, { createItem, deleteItem, editItem } from '../../utils/api';
 import { shortISO, isDate } from '../../utils/date-wrangler';
 import { getGrid } from './grid-builder';
 
@@ -56,5 +56,68 @@ export function useBookingsParams() {
     date,
     bookableId: hasId ? idInt : undefined,
     setBookingsDate,
+  };
+}
+
+export function useCreateBooking(key) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation(
+    (item) => createItem(`${process.env.REACT_APP_BASE_URL}/bookings`, item),
+    {
+      onSuccess: (booking) => {
+        queryClient.invalidateQueries(key);
+        const bookings = queryClient.getQueryData(key) || [];
+        queryClient.setQueryData(key, [...bookings, booking]);
+      },
+    }
+  );
+
+  return {
+    createBooking: mutation.mutate,
+    isCreating: mutation.isLoading,
+  };
+}
+
+export function useUpdateBooking(key) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation(
+    (item) =>
+      editItem(`${process.env.REACT_APP_BASE_URL}/bookings/${item.id}`, item),
+    {
+      onSuccess: (booking) => {
+        queryClient.invalidateQueries(key);
+        const bookings = queryClient.getQueryData(key) || [];
+        const bookingIndex = bookings.findIndex((b) => b.id === booking.id);
+        bookings[bookingIndex] = booking;
+        queryClient.setQueryData(key, bookings);
+      },
+    }
+  );
+
+  return {
+    updateBooking: mutation.mutate,
+    isUpdating: mutation.isLoading,
+  };
+}
+
+export function useDeleteBooking(key) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation(
+    (id) => deleteItem(`${process.env.REACT_APP_BASE_URL}/bookings/${id}`),
+    {
+      onSuccess: (resp, id) => {
+        queryClient.invalidateQueries(key);
+        const bookings = queryClient.getQueryData(key) || [];
+        queryClient.setQueryData(
+          key,
+          bookings.filter((b) => b.id !== id)
+        );
+      },
+    }
+  );
+
+  return {
+    deleteBooking: mutation.mutate,
+    isDeleting: mutation.isLoading,
   };
 }
